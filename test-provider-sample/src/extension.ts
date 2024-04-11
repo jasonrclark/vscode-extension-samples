@@ -200,6 +200,7 @@ function getWorkspaceTestPatterns() {
 
 async function findInitialFiles(controller: vscode.TestController, pattern: vscode.GlobPattern) {
 	for (const file of await vscode.workspace.findFiles(pattern)) {
+		console.log("Found a file! " + file);
 		getOrCreateFile(controller, file);
 	}
 }
