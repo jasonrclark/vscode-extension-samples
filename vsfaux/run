@@ -1,0 +1,6 @@
+pushd ../vscode
+npm run compile
+popd
+
+npm run compile
+npm run run

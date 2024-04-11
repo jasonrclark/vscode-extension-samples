@@ -95,28 +95,28 @@ export async function activate(context: vscode.ExtensionContext) {
 				const lineNo = test.range!.start.line;
 				const fileCoverage = coveredLines.get(test.uri!.toString());
 				const lineInfo = fileCoverage?.[lineNo];
-				if (lineInfo) {
-					lineInfo.executionCount++;
-				}
+				// if (lineInfo) {
+				// 	lineInfo.executed++;
+				// }
 
 				run.appendOutput(`Completed ${test.id}\r\n`);
 			}
 
-			run.coverageProvider = {
-				provideFileCoverage() {
-					const coverage: vscode.FileCoverage[] = [];
-					for (const [uri, statements] of coveredLines) {
-						coverage.push(
-							vscode.FileCoverage.fromDetails(
-								vscode.Uri.parse(uri),
-								statements.filter((s): s is vscode.StatementCoverage => !!s)
-							)
-						);
-					}
+			// run.coverageProvider = {
+			// 	provideFileCoverage() {
+			// 		const coverage: vscode.FileCoverage[] = [];
+			// 		for (const [uri, statements] of coveredLines) {
+			// 			coverage.push(
+			// 				vscode.FileCoverage.fromDetails(
+			// 					vscode.Uri.parse(uri),
+			// 					statements.filter((s): s is vscode.StatementCoverage => !!s)
+			// 				)
+			// 			);
+			// 		}
 
-					return coverage;
-				},
-			};
+			// 		return coverage;
+			// 	},
+			// };
 
 			run.end();
 		};

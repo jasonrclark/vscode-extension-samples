@@ -1,0 +1,24 @@
+{
+  "name": "vsfaux",
+  "version": "1.0.0",
+  "description": "See if we can load VS Code extensions without VS Code",
+  "scripts": {
+		"compile": "tsc -p ./",
+    "run": "npm run compile && node out/index.js",
+		"lint": "eslint \"src/**/*.ts\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "test-provider-sample": "file:../test-provider-sample",
+    "vscode": "file:../vscode"
+  },
+	"devDependencies": {
+		"@types/node": "^18",
+		"@typescript-eslint/eslint-plugin": "^6.7.0",
+		"@typescript-eslint/parser": "^6.7.0",
+		"eslint": "^8.26.0",
+		"typescript": "^5.4.2"
+	}
+}
