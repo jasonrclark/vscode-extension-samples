@@ -101,8 +101,16 @@ export namespace tests {
 		}
 	}
 
+	const controllers: TestController[] = [];
+
+	export function testControllers(): TestController[] {
+		return controllers;
+	}
+
 	export function createTestController(id: string, label: string): TestController {
-		return new MyTestController(id, label);
+		const controller =  new MyTestController(id, label);
+		controllers.push(controller)
+		return controller;
 	}
 }
 

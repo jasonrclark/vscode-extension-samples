@@ -14,18 +14,18 @@ vscode.workspace.workspaceFolders.push({
 });
 
 // Hacky find for our controller from within extension
-const controller = context.subscriptions[0];
-
-// Ask controller to refresh test items from the top
-controller.refreshHandler()
-	.then(() => {
-		controller.items.forEach((item: any, coll: any) => {
-			controller.resolveHandler(item)
-				.then(() => {
-					console.log(item);
-					item.children.forEach((child: any, _ : any) => console.log(child));
-				})
-				.catch((error: any) => console.error(error));
-		});
-	})
-	.catch((error: any) => console.error(error));
+vscode.tests.testControllers().forEach((controller: any) => {
+	// Ask controller to refresh test items from the top
+	controller.refreshHandler()
+		.then(() => {
+			controller.items.forEach((item: any, coll: any) => {
+				controller.resolveHandler(item)
+					.then(() => {
+						console.log(item);
+						item.children.forEach((child: any, _ : any) => console.log(child));
+					})
+					.catch((error: any) => console.error(error));
+			});
+		})
+		.catch((error: any) => console.error(error));
+});
