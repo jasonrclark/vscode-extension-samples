@@ -138,6 +138,10 @@ export namespace tests {
 		[Symbol.iterator](): Iterator<[id: string, testItem: TestItem], any, undefined> {
 			return this.items.entries();
 		}
+
+		array(): TestItem[] {
+			return Array.from(this.items.values());
+		}
 	}
 
 	const controllers: TestController[] = [];
@@ -432,6 +436,7 @@ export interface TestItemCollection extends Iterable<[id: string, testItem: Test
 	add(item: TestItem): void;
 	delete(itemId: string): void;
 	get(itemId: string): TestItem | undefined;
+	array(): TestItem[];
 }
 
 export class TestRunRequest {

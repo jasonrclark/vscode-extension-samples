@@ -32,10 +32,14 @@ vscode.tests.testControllers().forEach((controller: any) => {
 			Promise.all(resolutions)
 				.then(() => {
 					console.log("proof!");
-					console.log(controller.profiles[0].runHandler({
-						include: [controller.items[0]],
+					const test = Array.from(controller.items)[0]
+					console.log(test);
+
+					console.log(controller.profiles[0])
+					controller.profiles[0].runHandler({
+						include: [test],
 						continuous: false
-					}));
+					});
 				});
 		})
 		.catch((error: any) => console.error(error));
