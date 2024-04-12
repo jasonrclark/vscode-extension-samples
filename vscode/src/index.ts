@@ -30,6 +30,7 @@ export namespace tests {
 			return {
 				id,
 				uri,
+				children: new MyTestItemCollection(),
 				parent: undefined,
 				canResolveChildren: false,
 				busy: false,
@@ -112,9 +113,10 @@ export namespace workspace {
 		}
 	}
 
+	// FIXME: Doesn't actually find, just returns the known file
 	export function findFiles(include: GlobPattern, exclude?: GlobPattern | null, maxResults?: number, token?: CancellationToken): Thenable<Uri[]> {
 		return Promise.resolve([
-			Uri.from({scheme: "file", path: "/workspaces/vscode-extension-samples/test-provider-sample"})
+			Uri.from({scheme: "file", path: "/workspaces/vscode-extension-samples/test-provider-sample/README.md"})
 		]);
 	}
 
@@ -177,6 +179,55 @@ export interface TextDocumentChangeEvent {
 	readonly document: TextDocument;
 	// readonly contentChanges: readonly TextDocumentContentChangeEvent[];
 	// readonly reason: TextDocumentChangeReason | undefined;
+}
+
+export class StatementCoverage {
+	executed: number | boolean;
+	location: Position | Range;
+	// branches: BranchCoverage[];
+
+	constructor(executed: number | boolean, location: Position | Range, branches?: any[]) {
+		this.executed = executed;
+		this.location = location;
+		// this.branches = branches;
+	}
+}
+
+export class Range {
+	readonly start: Position;
+	readonly end: Position;
+
+	constructor(start: Position, end: Position) {
+		this.start = start;
+		this.end = end;
+	}
+}
+
+export class Position {
+	readonly line: number;
+	readonly character: number;
+
+	constructor(line: number, character: number) {
+		this.line = line;
+		this.character = character;
+	}
+
+	// isBefore(other: Position): boolean;
+	// isBeforeOrEqual(other: Position): boolean;
+	// isAfter(other: Position): boolean;
+	// isAfterOrEqual(other: Position): boolean;
+	// isEqual(other: Position): boolean;
+	// compareTo(other: Position): number;
+	// translate(lineDelta?: number, characterDelta?: number): Position;
+	// translate(change: {
+	// 	lineDelta?: number;
+	// 	characterDelta?: number;
+	// }): Position;
+	// with(line?: number, character?: number): Position;
+	// with(change: {
+	// 	line?: number;
+	// 	character?: number;
+	// }): Position;
 }
 
 export interface FileSystem {
@@ -313,7 +364,7 @@ export enum TestRunProfileKind {
 export interface TestItem {
 	readonly id: string;
 	readonly uri: Uri | undefined;
-	// readonly children: TestItemCollection;
+	readonly children: TestItemCollection;
 	readonly parent: TestItem | undefined;
 	// tags: readonly TestTag[];
 	canResolveChildren: boolean;
