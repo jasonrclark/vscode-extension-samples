@@ -27,6 +27,8 @@ export namespace tests {
 		// createTestRun(request: TestRunRequest, name?: string, persist?: boolean): TestRun;
 
 		createTestItem(id: string, label: string, uri?: Uri): TestItem {
+			console.log(`Creating test... ${id}, ${label}`)
+
 			return {
 				id,
 				uri,
@@ -81,7 +83,7 @@ export namespace tests {
 		}
 
 		add(item: TestItem): void {
-			this.items.set(item.uri?.toString() ?? "", item);
+			this.items.set(item.id, item);
 			this.size = this.items.size;
 		}
 

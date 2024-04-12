@@ -24,7 +24,6 @@ controller.refreshHandler()
 				.then(() => {
 					console.log(item);
 					item.children.forEach((child: any, _ : any) => console.log(child));
-
 				})
 				.catch((error: any) => console.error(error));
 		});
