@@ -12,23 +12,25 @@ export namespace tests {
 		label: string;
 
 		readonly items: TestItemCollection = new MyTestItemCollection();
+		readonly profiles: TestRunProfile[] = [];
 
-		createRunProfile(label: string,
+		createRunProfile(
+			label: string,
 			kind: TestRunProfileKind,
 			runHandler: (request: TestRunRequest, token: CancellationToken) => Thenable<void> | void,
 			isDefault?: boolean,
 			tag?: TestTag,
 			supportsContinuousRun?: boolean): TestRunProfile {
-			return new MyTestRunProfile();
+
+			const profile = new MyTestRunProfile(label, kind, isDefault!, runHandler);
+			this.profiles.push(profile);
+			return profile;
 		}
 
 		// resolveHandler?: (item: TestItem | undefined) => Thenable<void> | void;
 		refreshHandler: ((token: CancellationToken) => Thenable<void> | void) | undefined;
-		// createTestRun(request: TestRunRequest, name?: string, persist?: boolean): TestRun;
 
 		createTestItem(id: string, label: string, uri?: Uri): TestItem {
-			console.log(`Creating test... ${id}, ${label}`)
-
 			return {
 				id,
 				uri,
@@ -40,19 +42,33 @@ export namespace tests {
 			}
 		}
 
+		createTestRun(request: TestRunRequest, name?: string, persist?: boolean): TestRun {
+			return new MyTestRun(
+				name ?? "test",
+				persist ?? false
+			);
+		}
+
 		// invalidateTestResults(items?: TestItem | readonly TestItem[]): void;
 		// dispose(): void;
 	}
 
 	class MyTestRunProfile {
-		label: string;
+		readonly label: string;
 		readonly kind: TestRunProfileKind;
-		isDefault: boolean;
+		readonly isDefault: boolean;
+		readonly runHandler: (request: TestRunRequest, token: CancellationToken) => Thenable<void> | void;
 
-		constructor() {
-			this.label = "labelled";
-			this.kind = TestRunProfileKind.Run;
-			this.isDefault = false;
+		constructor(
+			label: string,
+			kind: TestRunProfileKind,
+			isDefault: boolean,
+			runHandler: (request: TestRunRequest, token: CancellationToken) => Thenable<void> | void
+		) {
+			this.label = label;
+			this.kind = kind;
+			this.isDefault = isDefault;
+			this.runHandler = runHandler;
 		}
 
 		// onDidChangeDefault: Event<boolean>;
@@ -62,6 +78,29 @@ export namespace tests {
 		// runHandler: (request: TestRunRequest, token: CancellationToken) => Thenable<void> | void;
 		// loadDetailedCoverage?: (testRun: TestRun, fileCoverage: FileCoverage, token: CancellationToken) => Thenable<FileCoverageDetail[]>;
 		// dispose(): void;
+	}
+
+	class MyTestRun implements TestRun {
+		readonly name: string | undefined;
+		// readonly token: CancellationToken;
+		readonly isPersisted: boolean;
+
+		constructor(name: string | undefined, isPersisted: boolean) {
+			this.name = name
+			// this.token = token
+			this.isPersisted = isPersisted
+		}
+
+		// enqueued(test: TestItem): void;
+		// started(test: TestItem): void;
+		// skipped(test: TestItem): void;
+		// failed(test: TestItem, message: TestMessage | readonly TestMessage[], duration?: number): void;
+		// errored(test: TestItem, message: TestMessage | readonly TestMessage[], duration?: number): void;
+		// passed(test: TestItem, duration?: number): void;
+		// appendOutput(output: string, location?: Location, test?: TestItem): void;
+		// addCoverage(fileCoverage: FileCoverage): void;
+		// end(): void;
+		// onDidDispose: Event<void>;
 	}
 
 	class MyTestItemCollection implements TestItemCollection {
@@ -417,10 +456,71 @@ export interface TestRunProfile {
 	// supportsContinuousRun: boolean;
 	// tag: TestTag | undefined;
 	// configureHandler: (() => void) | undefined;
-	// runHandler: (request: TestRunRequest, token: CancellationToken) => Thenable<void> | void;
+	runHandler: (request: TestRunRequest, token: CancellationToken) => Thenable<void> | void;
 	// loadDetailedCoverage?: (testRun: TestRun, fileCoverage: FileCoverage, token: CancellationToken) => Thenable<FileCoverageDetail[]>;
 	// dispose(): void;
 }
+
+export interface TestRun {
+	readonly name: string | undefined;
+	// readonly token: CancellationToken;
+	readonly isPersisted: boolean;
+	// enqueued(test: TestItem): void;
+	// started(test: TestItem): void;
+	// skipped(test: TestItem): void;
+	// failed(test: TestItem, message: TestMessage | readonly TestMessage[], duration?: number): void;
+	// errored(test: TestItem, message: TestMessage | readonly TestMessage[], duration?: number): void;
+	// passed(test: TestItem, duration?: number): void;
+	// appendOutput(output: string, location?: Location, test?: TestItem): void;
+	// // addCoverage(fileCoverage: FileCoverage): void;
+	// end(): void;
+	// onDidDispose: Event<void>;
+}
+
+export class Location {
+	uri: Uri;
+	// range: Range;
+
+	constructor(uri: Uri, rangeOrPosition: Range | Position) {
+		this.uri = uri;
+		// this.range = rangeOrPosition;
+	}
+}
+
+export class TestMessage {
+	message: string | MarkdownString;
+	expectedOutput?: string;
+	actualOutput?: string;
+	location?: Location;
+	contextValue?: string;
+	// static diff(message: string | MarkdownString, expected: string, actual: string): TestMessage;
+
+	constructor(message: string | MarkdownString) {
+		this.message = message;
+	}
+}
+
+export class MarkdownString {
+	value: string;
+	isTrusted?: boolean | {
+		readonly enabledCommands: readonly string[];
+	};
+
+	supportThemeIcons?: boolean;
+	supportHtml?: boolean;
+	baseUri?: Uri;
+
+	constructor(value?: string, supportThemeIcons?: boolean) {
+		this.value = value ?? "";
+		this.supportThemeIcons = supportThemeIcons;
+	}
+	// appendText(value: string): MarkdownString;
+	// appendMarkdown(value: string): MarkdownString;
+	// appendCodeblock(value: string, language?: string): MarkdownString;
+}
+
+
+
 
 export class TestTag {
 	readonly id: string;
@@ -437,7 +537,7 @@ export interface TestController {
 	// createRunProfile(label: string, kind: TestRunProfileKind, runHandler: (request: TestRunRequest, token: CancellationToken) => Thenable<void> | void, isDefault?: boolean, tag?: TestTag, supportsContinuousRun?: boolean): TestRunProfile;
 	resolveHandler?: (item: TestItem | undefined) => Thenable<void> | void;
 	refreshHandler: ((token: CancellationToken) => Thenable<void> | void) | undefined;
-	// createTestRun(request: TestRunRequest, name?: string, persist?: boolean): TestRun;
+	createTestRun(request: TestRunRequest, name?: string, persist?: boolean): TestRun;
 	// createTestItem(id: string, label: string, uri?: Uri): TestItem;
 	// invalidateTestResults(items?: TestItem | readonly TestItem[]): void;
 	// dispose(): void;

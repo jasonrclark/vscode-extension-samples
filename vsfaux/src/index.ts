@@ -18,14 +18,25 @@ vscode.tests.testControllers().forEach((controller: any) => {
 	// Ask controller to refresh test items from the top
 	controller.refreshHandler()
 		.then(() => {
-			controller.items.forEach((item: any, coll: any) => {
-				controller.resolveHandler(item)
-					.then(() => {
-						console.log(item);
-						item.children.forEach((child: any, _ : any) => console.log(child));
-					})
-					.catch((error: any) => console.error(error));
-			});
+			const resolutions: PromiseLike<void>[] = [];
+			controller.items.forEach((item: any, _: any) => {
+				resolutions.push(
+						controller.resolveHandler(item)
+						.then(() => {
+							console.log(item);
+							item.children.forEach((child: any, _ : any) => console.log(child));
+						})
+						.catch((error: any) => console.error(error)));
+			})
+
+			Promise.all(resolutions)
+				.then(() => {
+					console.log("proof!");
+					console.log(controller.profiles[0].runHandler({
+						include: [controller.items[0]],
+						continuous: false
+					}));
+				});
 		})
 		.catch((error: any) => console.error(error));
 });
